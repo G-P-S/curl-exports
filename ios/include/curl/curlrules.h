@@ -137,24 +137,36 @@
  * Verify that the size previously defined and expected for long
  * is the same as the one reported by sizeof() at compile time.
  */
-// TEMP HACK. Causing build failures for 32bit targets.  Comment out
-// for now, until we can properly fix on Monday.
+
+// IMPORTANT NOTE: 
+// The curl header file is included for all iPhone targets, which means
+// for iPhone5 this file will be compiled as 32 bit.  However for iOS
+// AFNetworking is actually used, NOT curl. The rub is how the Jakarta
+// project is organized and used as a Cocoapod.  There's no easy way
+// to break out 32 & 64 bit header files.  What need to be done is re-org
+// the Jakata project to not include curl for iOS targets, which is a larger task.
 //
+// As a short term fix, we'll run this check if we're compiling
+// a 64 bit target.  This working around is sub-optimal.
+// 12/14/2015 DeanG.
 //
-//typedef char
-//  __curl_rule_01__
-//    [CurlchkszEQ(long, CURL_SIZEOF_LONG)];
-//
+#if defined(__LP64__) || defined(__x86_64__)
+
+typedef char
+  __curl_rule_01__
+    [CurlchkszEQ(long, CURL_SIZEOF_LONG)];
+
 
 /*
  * Verify that the size previously defined and expected for
  * curl_off_t is actually the the same as the one reported
  * by sizeof() at compile time.
  */
-// TEMP HACK. Causing build failures for 32bit targets.
-//typedef char
-//  __curl_rule_02__
-//    [CurlchkszEQ(curl_off_t, CURL_SIZEOF_CURL_OFF_T)];
+typedef char
+  __curl_rule_02__
+    [CurlchkszEQ(curl_off_t, CURL_SIZEOF_CURL_OFF_T)];
+
+#endif
 
 /*
  * Verify at compile time that the size of curl_off_t as reported
